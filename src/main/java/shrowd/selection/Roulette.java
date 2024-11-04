@@ -1,17 +1,16 @@
 package shrowd.selection;
 
 import shrowd.Chromosome;
-import shrowd.Selection;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Roulette implements Selection {
+public class Roulette implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String cases, List<Chromosome> chromosomes) {
+    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
         List<Double> q = new ArrayList<>();
         List<Double> result = new ArrayList<>();
         List<Double> temp = new ArrayList<>();
@@ -22,13 +21,13 @@ public class Roulette implements Selection {
                 .map(Chromosome::getRastriginValue)
                 .collect(Collectors.toList());
 
-        if (cases.equals("min")) {
+        if (selectionMode.equals("min")) {
             for (Double r : rastriginValue) {
                 double inverseValue = 1.0 / r;
                 temp.add(inverseValue);
                 sum += inverseValue;
             }
-        } else if (cases.equals("max")) {
+        } else if (selectionMode.equals("max")) {
             temp = rastriginValue;
             sum = rastriginValue.stream()
                     .mapToDouble(Double::doubleValue)

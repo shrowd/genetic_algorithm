@@ -3,9 +3,6 @@ package shrowd;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import shrowd.selection.Ranking;
-import shrowd.selection.Roulette;
-import shrowd.selection.Tournament;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -106,7 +103,10 @@ public class GeneticAlgorithm {
         return evaluationResults;
     }
 
-    public final void optimize(String cases) {
+    public final void optimize(String selectionMethod,
+                               String selectionMode,
+                               String crossoverMethod,
+                               int crossoverNumPoints) {
         int[] binaryLengths = computeBinaryLengths(a, b, d);
         int[] numberOfValues = computeNumberOfValues(a, b, d);
         List<Set<String>> population = createPopulation(binaryLengths, numberOfValues);
@@ -115,38 +115,27 @@ public class GeneticAlgorithm {
         List<String> chromosomesStrings = chromosomes.stream()
                 .map(Chromosome::getChromosome)
                 .collect(Collectors.toList());
-        Selection t = new Tournament();
-        Selection r = new Ranking();
-        Selection ro = new Roulette();
-        List<Double> resultsTournament = t.selectionMethod(cases, chromosomes);
-        List<Double> resultsRanking = r.selectionMethod(cases, chromosomes);
-        List<Double> resultsRoulette = ro.selectionMethod(cases, chromosomes);
+
+        Selection selection = new Selection(selectionMethod);
+        List<Double> resultsSelection = selection.performSelection(selectionMode, chromosomes);
+
         List<String> resultsMutation = mutate(chromosomesStrings);
         List<String> resultsInversion = inverse(resultsMutation);
+
+        Crossover crossover = new Crossover(crossoverMethod, crossoverNumPoints);
+        List<List<String>> crossoverResult = crossover.performCrossover(resultsInversion);
 
         System.out.println("Chromosomes and rastrigin function value:");
         for (Chromosome c : chromosomes) {
             System.out.println(c);
         }
 
-        System.out.println("\nSelection methods:");
-        System.out.println("Tournament method: " + resultsTournament
-                + "\nRanking method:    " + resultsRanking
-                + "\nRoulette method:   " + resultsRoulette);
+        System.out.println("\n" + selectionMethod + " selection(" + selectionMode +"):");
+        System.out.println(resultsSelection);
 
         System.out.println("\nChromosomes before operations: " + chromosomesStrings +
                 "\nChromosomes after mutation:    " + resultsMutation +
                 "\nChromosomes after inversion:   " + resultsInversion);
-
-    }
-
-    public static void main(String[] args) {
-        double[] a = {-1, -1, -1};
-        double[] b = {1, 1, 1};
-        int[] d = {1, 1, 1};
-        int N = 5;
-
-        GeneticAlgorithm algorithm = new GeneticAlgorithm(a, b, d, N);
-        algorithm.optimize("max");
+        System.out.println("Crossover: " + crossoverResult);
     }
 }

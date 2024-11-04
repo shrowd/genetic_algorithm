@@ -1,7 +1,6 @@
 package shrowd.selection;
 
 import shrowd.Chromosome;
-import shrowd.Selection;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Ranking implements Selection {
+public class Ranking implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String cases, List<Chromosome> chromosomes) {
+    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
         int N = chromosomes.size();
         List<Double> result = new ArrayList<>();
         Random rnd = new Random();
@@ -20,9 +19,9 @@ public class Ranking implements Selection {
                 .map(Chromosome::getRastriginValue)
                 .collect(Collectors.toList());
 
-        if (cases.equals("max")) {
+        if (selectionMode.equals("max")) {
             rastriginValue.sort(Comparator.reverseOrder());
-        } else if (cases.equals("min")) {
+        } else if (selectionMode.equals("min")) {
             rastriginValue.sort(Comparator.naturalOrder());
         }
 

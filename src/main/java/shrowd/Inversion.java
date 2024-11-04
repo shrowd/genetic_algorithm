@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static shrowd.Constants.INVERSION_PROB;
+
 public class Inversion {
 
     public static List<String> inverse(List<String> chromosomes) {
@@ -13,7 +15,7 @@ public class Inversion {
         for (String chromosome : chromosomes) {
             double r = random.nextDouble();
 
-            if (r < 0.2) {
+            if (r < INVERSION_PROB) {
                 int m = chromosome.length();
                 int a = random.nextInt(m);
                 int b = random.nextInt(m);

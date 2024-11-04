@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static shrowd.Constants.MUTATION_PROB;
+
 public class Mutation {
 
     public static List<String> mutate(List<String> chromosomes) {
@@ -15,7 +17,7 @@ public class Mutation {
 
             for (int i = 0; i < genes.length; i++) {
                 double prob = random.nextDouble();
-                if (prob < 0.2) {
+                if (prob < MUTATION_PROB) {
                     genes[i] = (genes[i] == '0') ? '1' : '0';
                 }
             }

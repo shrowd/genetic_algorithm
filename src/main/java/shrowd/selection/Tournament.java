@@ -1,14 +1,13 @@
 package shrowd.selection;
 
 import shrowd.Chromosome;
-import shrowd.Selection;
 
 import java.util.*;
 
-public class Tournament implements Selection {
+public class Tournament implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String cases, List<Chromosome> chromosomes) {
+    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
         Random rnd = new Random();
         List<Double> result = new ArrayList<>();
 
@@ -24,10 +23,10 @@ public class Tournament implements Selection {
             }
 
             Double bestIndividual = 0.0;
-            if (cases.equals("max")) {
+            if (selectionMode.equals("max")) {
                 bestIndividual = Collections.max(tournamentGroup,
                         Comparator.comparingDouble(Double::doubleValue));
-            } else if (cases.equals("min")) {
+            } else if (selectionMode.equals("min")) {
                 bestIndividual = Collections.min(tournamentGroup,
                         Comparator.comparingDouble(Double::doubleValue));
             }
