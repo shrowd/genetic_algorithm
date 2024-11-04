@@ -103,16 +103,28 @@ public class GeneticAlgorithm {
         return evaluationResults;
     }
 
-    public final void optimize() {
+    public final void optimize(String cases) {
         int[] binaryLengths = computeBinaryLengths(a, b, d);
         int[] numberOfValues = computeNumberOfValues(a, b, d);
         List<Set<String>> population = createPopulation(binaryLengths, numberOfValues);
         List<Double> results = ratePopulation(population, binaryLengths);
         List<Chromosome> chromosomes = generateChromosomes(population, results);
+        Selection t = new Tournament();
+        Selection r = new Ranking();
+        Selection ro = new Roulette();
+        List<Double> resultsTournament = t.selectionMethod(cases, chromosomes);
+        List<Double> resultsRanking = r.selectionMethod(cases, chromosomes);
+        List<Double> resultsRoulette = ro.selectionMethod(cases, chromosomes);
 
+        System.out.println("Chromosomes and rastrigin function value:");
         for (Chromosome c : chromosomes) {
             System.out.println(c);
         }
+
+        System.out.println("\nSelection methods:");
+        System.out.println("Tournament method: " + resultsTournament
+                + "\nRanking method:    " + resultsRanking
+                + "\nRoulette method:   " + resultsRoulette);
     }
 
     public static void main(String[] args) {
@@ -122,6 +134,6 @@ public class GeneticAlgorithm {
         int N = 5;
 
         GeneticAlgorithm algorithm = new GeneticAlgorithm(a, b, d, N);
-        algorithm.optimize();
+        algorithm.optimize("max");
     }
 }
