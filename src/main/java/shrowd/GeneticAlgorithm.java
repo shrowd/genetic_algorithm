@@ -10,7 +10,10 @@ import shrowd.selection.Tournament;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static shrowd.Inversion.inverse;
+import static shrowd.Mutation.mutate;
 import static shrowd.Utils.*;
 
 @Getter
@@ -109,12 +112,17 @@ public class GeneticAlgorithm {
         List<Set<String>> population = createPopulation(binaryLengths, numberOfValues);
         List<Double> results = ratePopulation(population, binaryLengths);
         List<Chromosome> chromosomes = generateChromosomes(population, results);
+        List<String> chromosomesStrings = chromosomes.stream()
+                .map(Chromosome::getChromosome)
+                .collect(Collectors.toList());
         Selection t = new Tournament();
         Selection r = new Ranking();
         Selection ro = new Roulette();
         List<Double> resultsTournament = t.selectionMethod(cases, chromosomes);
         List<Double> resultsRanking = r.selectionMethod(cases, chromosomes);
         List<Double> resultsRoulette = ro.selectionMethod(cases, chromosomes);
+        List<String> resultsMutation = mutate(chromosomesStrings);
+        List<String> resultsInversion = inverse(resultsMutation);
 
         System.out.println("Chromosomes and rastrigin function value:");
         for (Chromosome c : chromosomes) {
@@ -125,6 +133,11 @@ public class GeneticAlgorithm {
         System.out.println("Tournament method: " + resultsTournament
                 + "\nRanking method:    " + resultsRanking
                 + "\nRoulette method:   " + resultsRoulette);
+
+        System.out.println("\nChromosomes before operations: " + chromosomesStrings +
+                "\nChromosomes after mutation:    " + resultsMutation +
+                "\nChromosomes after inversion:   " + resultsInversion);
+
     }
 
     public static void main(String[] args) {
