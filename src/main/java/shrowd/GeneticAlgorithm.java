@@ -1,31 +1,18 @@
 package shrowd;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static shrowd.Constants.POPULATION_SIZE;
 import static shrowd.Inversion.inverse;
 import static shrowd.Mutation.mutate;
 import static shrowd.Utils.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class GeneticAlgorithm {
+public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
 
-    private final double[] a;
-    private final double[] b;
-    private final int[] d;
-    private final int N;
-
-
-    private List<Set<String>> createPopulation(int[] binaryLengths, int[] numberOfValues) {
-        List<Set<String>> population = new ArrayList<>();
+    private List<String> createPopulation(int[] binaryLengths, int[] numberOfValues) {
+        List<String> population = new ArrayList<>();
+        List<List<String>> binaryGroups = new ArrayList<>();
         Random rnd = new Random();
 
         for (int i = 0; i < binaryLengths.length; i++) {
@@ -33,7 +20,7 @@ public class GeneticAlgorithm {
             int maxValue = numberOfValues[i];
             Set<String> individuals = new HashSet<>();
 
-            while (individuals.size() < N) {
+            while (individuals.size() < POPULATION_SIZE) {
                 int randomNumber = rnd.nextInt(maxValue);
 
                 String binaryString = String.format("%" + length + "s",
@@ -42,74 +29,68 @@ public class GeneticAlgorithm {
                 individuals.add(binaryString);
             }
 
-            population.add(individuals);
+            binaryGroups.add(new ArrayList<>(individuals));
+        }
+
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            StringBuilder chromosome = new StringBuilder();
+            for (List<String> group : binaryGroups) {
+                chromosome.append(group.get(i));
+            }
+            population.add(chromosome.toString());
         }
 
         return population;
     }
 
-    private List<Chromosome> generateChromosomes(List<Set<String>> population, List<Double> rastriginValues) {
-        List<Chromosome> chromosomes = new ArrayList<>();
+    private List<Double> ratePopulation(List<String> population, int[] binaryLengths) {
+        List<List<Double>> ratedPopulations = new ArrayList<>();
 
-        for (int i = 0; i < N; i++) {
+        for (String chromosome : population) {
+            List<Double> normalizedValues = new ArrayList<>();
+            int currentIndex = 0;
 
-            StringBuilder individual = new StringBuilder();
+            for (int i = 0; i < binaryLengths.length; i++) {
+                int length = binaryLengths[i];
+                String subChromosome = chromosome.substring(currentIndex, currentIndex + length);
+                currentIndex += length;
 
-            for (Set<String> gene : population) {
-                List<String> list = new ArrayList<>(gene);
-                individual.append(list.get(i % list.size()));
+                double decimalValue = Integer.parseInt(subChromosome, 2);
+
+                double normalizedValue = a[i] + ((b[i] - a[i]) * decimalValue) / (Math.pow(2, length) - 1);
+                normalizedValues.add(normalizedValue);
             }
 
+            ratedPopulations.add(normalizedValues);
+        }
 
-            chromosomes.add(new Chromosome(individual.toString(), rastriginValues.get(i)));
+        return ratedPopulations.stream()
+                .map(individual -> rastrigin(individual.stream()
+                        .mapToDouble(Double::doubleValue)
+                        .toArray()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Chromosome> generateChromosomes(List<String> population, List<Double> rastriginValues) {
+        List<Chromosome> chromosomes = new ArrayList<>();
+
+        for (int i = 0; i < population.size(); i++) {
+            String chromosome = population.get(i);
+            double rastriginValue = rastriginValues.get(i);
+
+            chromosomes.add(new Chromosome(chromosome, rastriginValue));
         }
 
         return chromosomes;
     }
 
-    private List<Double> ratePopulation(List<Set<String>> populations, int[] binaryLengths) {
-        List<List<Double>> ratedPopulations = new ArrayList<>();
-
-        for (int index = 0; index < populations.size(); index++) {
-            Set<String> population = populations.get(index);
-            double a = this.a[index];
-            double b = this.b[index];
-            int m = binaryLengths[index];
-
-            List<Double> decimalValues = new ArrayList<>();
-            for (String individual : population) {
-                decimalValues.add((double) Integer.parseInt(individual, 2));
-            }
-
-            List<Double> normalizedValues = new ArrayList<>();
-            for (Double d : decimalValues) {
-                normalizedValues.add(a + ((b - a) * d) / (Math.pow(2, m) - 1));
-            }
-            ratedPopulations.add(normalizedValues);
-        }
-
-        List<List<Double>> transposedPopulations = transpose(ratedPopulations);
-
-        List<Double> evaluationResults = new ArrayList<>();
-        transposedPopulations.stream()
-                .map(individual -> rastrigin(individual.stream()
-                        .mapToDouble(Double::doubleValue)
-                        .toArray()))
-                .map(result -> new BigDecimal(result)
-                        .setScale(2, RoundingMode.HALF_UP)
-                        .doubleValue())
-                .forEach(evaluationResults::add);
-
-        return evaluationResults;
-    }
-
-    public final void optimize(String selectionMethod,
-                               String selectionMode,
-                               String crossoverMethod,
-                               int crossoverNumPoints) {
+    public void optimize(String selectionMethod,
+                         String selectionMode,
+                         String crossoverMethod,
+                         int crossoverNumPoints) {
         int[] binaryLengths = computeBinaryLengths(a, b, d);
         int[] numberOfValues = computeNumberOfValues(a, b, d);
-        List<Set<String>> population = createPopulation(binaryLengths, numberOfValues);
+        List<String> population = createPopulation(binaryLengths, numberOfValues);
         List<Double> results = ratePopulation(population, binaryLengths);
         List<Chromosome> chromosomes = generateChromosomes(population, results);
         List<String> chromosomesStrings = chromosomes.stream()
@@ -130,7 +111,7 @@ public class GeneticAlgorithm {
             System.out.println(c);
         }
 
-        System.out.println("\n" + selectionMethod + " selection(" + selectionMode +"):");
+        System.out.println("\n" + selectionMethod + " selection(" + selectionMode + "):");
         System.out.println(resultsSelection);
 
         System.out.println("\nChromosomes before operations: " + chromosomesStrings +

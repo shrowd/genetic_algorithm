@@ -1,8 +1,5 @@
 package shrowd;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static shrowd.Constants.A;
 import static shrowd.Constants.W;
 
@@ -14,7 +11,9 @@ public class Utils {
             sum += Math.pow(xi, 2) - A * Math.cos(W * xi);
         }
 
-        return A * x.length + sum;
+        double result = A * x.length + sum;
+
+        return Math.round(result * 100.0) / 100.0;
     }
 
     public static int[] computeBinaryLengths(double[] a, double[] b, int[] d) {
@@ -45,21 +44,5 @@ public class Utils {
         }
 
         return numberOfValues;
-    }
-
-    public static List<List<Double>> transpose(List<List<Double>> matrix) {
-        List<List<Double>> transposed = new ArrayList<>();
-
-        int numCols = matrix.get(0).size();
-
-        for (int col = 0; col < numCols; col++) {
-            List<Double> newRow = new ArrayList<>();
-            for (List<Double> doubles : matrix) {
-                newRow.add(doubles.get(col));
-            }
-            transposed.add(newRow);
-        }
-
-        return transposed;
     }
 }
