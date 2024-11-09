@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SelectionStrategy {
 
-    List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes);
+    List<Chromosome> selectionMethod(String selectionMode, List<Chromosome> chromosomes);
 }

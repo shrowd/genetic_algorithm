@@ -7,28 +7,28 @@ import java.util.*;
 public class Tournament implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
+    public List<Chromosome> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
         Random rnd = new Random();
-        List<Double> result = new ArrayList<>();
+        List<Chromosome> result = new ArrayList<>();
 
         for (int i = 0; i < chromosomes.size(); i++) {
             Set<Integer> indices = new HashSet<>();
-            List<Double> tournamentGroup = new ArrayList<>();
+            List<Chromosome> tournamentGroup = new ArrayList<>();
 
             while (indices.size() < 2) {
                 int randomIndex = rnd.nextInt(chromosomes.size());
                 if (indices.add(randomIndex)) {
-                    tournamentGroup.add(chromosomes.get(randomIndex).getRastriginValue());
+                    tournamentGroup.add(chromosomes.get(randomIndex));
                 }
             }
 
-            Double bestIndividual = 0.0;
+            Chromosome bestIndividual = null;
             if (selectionMode.equals("max")) {
                 bestIndividual = Collections.max(tournamentGroup,
-                        Comparator.comparingDouble(Double::doubleValue));
+                        Comparator.comparing(Chromosome::getRastriginValue));
             } else if (selectionMode.equals("min")) {
                 bestIndividual = Collections.min(tournamentGroup,
-                        Comparator.comparingDouble(Double::doubleValue));
+                        Comparator.comparing(Chromosome::getRastriginValue));
             }
 
             result.add(bestIndividual);

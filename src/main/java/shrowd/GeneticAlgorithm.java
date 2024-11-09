@@ -98,7 +98,7 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
                 .collect(Collectors.toList());
 
         Selection selection = new Selection(selectionMethod);
-        List<Double> resultsSelection = selection.performSelection(selectionMode, chromosomes);
+        List<Chromosome> resultsSelection = selection.performSelection(selectionMode, chromosomes);
 
         List<String> resultsMutation = mutate(chromosomesStrings);
         List<String> resultsInversion = inverse(resultsMutation);
@@ -112,7 +112,9 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
         }
 
         System.out.println("\n" + selectionMethod + " selection(" + selectionMode + "):");
-        System.out.println(resultsSelection);
+        for (Chromosome c : resultsSelection) {
+            System.out.println(c);
+        }
 
         System.out.println("\nChromosomes before operations: " + chromosomesStrings +
                 "\nChromosomes after mutation:    " + resultsMutation +

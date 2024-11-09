@@ -24,7 +24,7 @@ public class Selection {
         };
     }
 
-    public List<Double> performSelection(String selectionMode, List<Chromosome> chromosomes) {
+    public List<Chromosome> performSelection(String selectionMode, List<Chromosome> chromosomes) {
 
         return selection.selectionMethod(selectionMode, chromosomes);
     }

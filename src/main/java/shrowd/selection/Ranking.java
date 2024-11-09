@@ -6,28 +6,24 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Ranking implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
+    public List<Chromosome> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
+        List<Chromosome> result = new ArrayList<>();
         int N = chromosomes.size();
-        List<Double> result = new ArrayList<>();
         Random rnd = new Random();
-        List<Double> rastriginValue = chromosomes.stream()
-                .map(Chromosome::getRastriginValue)
-                .collect(Collectors.toList());
 
         if (selectionMode.equals("max")) {
-            rastriginValue.sort(Comparator.reverseOrder());
+            chromosomes.sort(Comparator.comparing(Chromosome::getRastriginValue).reversed());
         } else if (selectionMode.equals("min")) {
-            rastriginValue.sort(Comparator.naturalOrder());
+            chromosomes.sort(Comparator.comparing(Chromosome::getRastriginValue));
         }
 
         for (int i = 0; i < N; i++) {
             int randomNumber = rnd.nextInt(N) + 1;
-            result.add(rastriginValue.get(rnd.nextInt(randomNumber)));
+            result.add(chromosomes.get(rnd.nextInt(randomNumber)));
         }
 
         return result;

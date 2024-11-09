@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 public class Roulette implements SelectionStrategy {
 
     @Override
-    public List<Double> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
+    public List<Chromosome> selectionMethod(String selectionMode, List<Chromosome> chromosomes) {
         List<Double> q = new ArrayList<>();
-        List<Double> result = new ArrayList<>();
+        List<Chromosome> result = new ArrayList<>();
         List<Double> temp = new ArrayList<>();
         Random rnd = new Random();
         double sum = 0.0;
@@ -44,7 +44,7 @@ public class Roulette implements SelectionStrategy {
             double randomNumber = rnd.nextDouble();
             for (int j = 0; j < q.size(); j++) {
                 if (randomNumber <= q.get(j)) {
-                    result.add(rastriginValue.get(j));
+                    result.add(chromosomes.get(j));
                     break;
                 }
             }
