@@ -9,11 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Chromosome {
 
-    private String chromosome;
+    private String genotype;
     private double rastriginValue;
 
     @Override
     public String toString() {
-        return "Chromosome: " + chromosome + ", Rastrigin Value: " + rastriginValue;
+        return "Chromosome: " + genotype + ", Rastrigin Value: " + rastriginValue;
     }
 }

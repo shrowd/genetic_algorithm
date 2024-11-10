@@ -93,18 +93,15 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
         List<String> population = createPopulation(binaryLengths, numberOfValues);
         List<Double> results = ratePopulation(population, binaryLengths);
         List<Chromosome> chromosomes = generateChromosomes(population, results);
-        List<String> chromosomesStrings = chromosomes.stream()
-                .map(Chromosome::getChromosome)
-                .collect(Collectors.toList());
 
         Selection selection = new Selection(selectionMethod);
         List<Chromosome> resultsSelection = selection.performSelection(selectionMode, chromosomes);
 
-        List<String> resultsMutation = mutate(chromosomesStrings);
-        List<String> resultsInversion = inverse(resultsMutation);
+        List<Chromosome> resultsMutation = mutate(resultsSelection);
+        //List<String> resultsInversion = inverse(resultsMutation);
 
         Crossover crossover = new Crossover(crossoverMethod, crossoverNumPoints);
-        List<List<String>> crossoverResult = crossover.performCrossover(resultsInversion);
+        //List<List<String>> crossoverResult = crossover.performCrossover(resultsInversion);
 
         System.out.println("Chromosomes and rastrigin function value:");
         for (Chromosome c : chromosomes) {
@@ -116,9 +113,14 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
             System.out.println(c);
         }
 
-        System.out.println("\nChromosomes before operations: " + chromosomesStrings +
-                "\nChromosomes after mutation:    " + resultsMutation +
-                "\nChromosomes after inversion:   " + resultsInversion);
-        System.out.println("Crossover: " + crossoverResult);
+        System.out.println("\nMutation results:");
+        for (Chromosome c : resultsMutation) {
+            System.out.println(c);
+        }
+
+//        System.out.println("\nChromosomes before operations: " + chromosomesStrings +
+//                "\nChromosomes after mutation:    " + resultsMutation +
+//                "\nChromosomes after inversion:   " + resultsInversion);
+//        System.out.println("Crossover: " + crossoverResult);
     }
 }

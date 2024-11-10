@@ -8,12 +8,12 @@ import static shrowd.Constants.MUTATION_PROB;
 
 public class Mutation {
 
-    public static List<String> mutate(List<String> chromosomes) {
-        List<String> result = new ArrayList<>();
+    public static List<Chromosome> mutate(List<Chromosome> chromosomes) {
+        List<Chromosome> result = new ArrayList<>();
         Random random = new Random();
 
-        for (String chromosome : chromosomes) {
-            char[] genes = chromosome.toCharArray();
+        for (Chromosome chromosome : chromosomes) {
+            char[] genes = chromosome.getGenotype().toCharArray();
 
             for (int i = 0; i < genes.length; i++) {
                 double prob = random.nextDouble();
@@ -21,7 +21,11 @@ public class Mutation {
                     genes[i] = (genes[i] == '0') ? '1' : '0';
                 }
             }
-            result.add(new String(genes));
+
+            String mutatedGenotype = new String(genes);
+            Chromosome mutatedChromosome = new Chromosome(mutatedGenotype, chromosome.getRastriginValue());
+
+            result.add(mutatedChromosome);
         }
 
         return result;
