@@ -1,6 +1,7 @@
 package shrowd;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static shrowd.Chromosome.generateChromosomes;
 import static shrowd.Inversion.inverse;
@@ -29,7 +30,10 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
         List<Chromosome> resultsInversion = inverse(resultsMutation);
 
         Crossover crossover = new Crossover(crossoverMethod, crossoverNumPoints);
-        //List<List<String>> crossoverResult = crossover.performCrossover(resultsInversion);
+        List<String> chromosomesStrings = resultsInversion.stream()
+                .map(Chromosome::getGenotype)
+                .collect(Collectors.toList());
+        List<String> resultsCrossover = crossover.performCrossover(chromosomesStrings);
 
         System.out.println("Chromosomes and rastrigin function value:");
         for (Chromosome c : chromosomes) {
@@ -52,6 +56,9 @@ public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
         for (Chromosome c : resultsInversion) {
             System.out.println(c);
         }
+
+        System.out.println("\nCrossover results:");
+        System.out.println(resultsCrossover);
 
 //        System.out.println("\nChromosomes before operations: " + chromosomesStrings +
 //                "\nChromosomes after mutation:    " + resultsMutation +

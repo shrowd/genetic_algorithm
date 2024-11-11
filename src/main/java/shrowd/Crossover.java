@@ -50,14 +50,28 @@ public class Crossover {
         };
     }
 
-    public List<List<String>> performCrossover(List<String> chromosomes) {
+    public List<String> performCrossover(List<String> chromosomes) {
         List<String> pairs = crossbreedingChoosing(chromosomes);
-        List<List<String>> result = new ArrayList<>();
+        List<String> result = new ArrayList<>(chromosomes);
+
+        if (pairs.size() < 2) {
+            return result;
+        }
 
         for (int i = 0; i < pairs.size(); i += 2) {
             String parent1 = pairs.get(i);
             String parent2 = pairs.get(i + 1);
-            result.add(crossover.crossoverMethod(parent1, parent2));
+
+            int index1 = chromosomes.indexOf(parent1);
+            int index2 = chromosomes.indexOf(parent2);
+
+            List<String> offspring = crossover.crossoverMethod(parent1, parent2);
+
+            String child1 = offspring.get(0);
+            String child2 = offspring.get(1);
+
+            result.set(index1, child1);
+            result.set(index2, child2);
         }
 
         return result;
