@@ -8,15 +8,16 @@ import static shrowd.Constants.INVERSION_PROB;
 
 public class Inversion {
 
-    public static List<String> inverse(List<String> chromosomes) {
-        List<String> result = new ArrayList<>();
+    public static List<Chromosome> inverse(List<Chromosome> chromosomes) {
+        List<Chromosome> result = new ArrayList<>();
         Random random = new Random();
 
-        for (String chromosome : chromosomes) {
+        for (Chromosome chromosome : chromosomes) {
+            String genotype = chromosome.getGenotype();
             double r = random.nextDouble();
 
             if (r < INVERSION_PROB) {
-                int m = chromosome.length();
+                int m = genotype.length();
                 int a = random.nextInt(m);
                 int b = random.nextInt(m);
 
@@ -26,7 +27,7 @@ public class Inversion {
                     b = temp;
                 }
 
-                char[] genes = chromosome.toCharArray();
+                char[] genes = genotype.toCharArray();
                 while (a < b) {
                     char temp = genes[a];
                     genes[a] = genes[b];
@@ -34,7 +35,7 @@ public class Inversion {
                     a++;
                     b--;
                 }
-                result.add(new String(genes));
+                result.add(new Chromosome(new String(genes), chromosome.getRastriginValue()));
             } else {
                 result.add(chromosome);
             }
