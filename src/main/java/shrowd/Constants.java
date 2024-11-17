@@ -8,4 +8,5 @@ public interface Constants {
     double CROSSOVER_PROB = 0.6;
     double MUTATION_PROB = 0.2;
     double INVERSION_PROB = 0.2;
+    int EPOCHS_NUMBER = 1000;
 }

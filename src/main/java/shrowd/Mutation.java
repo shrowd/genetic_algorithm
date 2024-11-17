@@ -23,7 +23,7 @@ public class Mutation {
             }
 
             String mutatedGenotype = new String(genes);
-            Chromosome mutatedChromosome = new Chromosome(mutatedGenotype, chromosome.getRastriginValue());
+            Chromosome mutatedChromosome = new Chromosome(mutatedGenotype);
 
             result.add(mutatedChromosome);
         }

@@ -1,9 +1,14 @@
 package shrowd;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 import static shrowd.Chromosome.generateChromosomes;
+import static shrowd.Chromosome.getUniqueChromosomes;
+import static shrowd.Constants.EPOCHS_NUMBER;
+import static shrowd.Constants.POPULATION_SIZE;
 import static shrowd.Inversion.inverse;
 import static shrowd.Mutation.mutate;
 import static shrowd.PopulationUtils.*;
@@ -12,57 +17,95 @@ import static shrowd.Utils.computeNumberOfValues;
 
 public record GeneticAlgorithm(double[] a, double[] b, int[] d) {
 
-
-    public void optimize(String selectionMethod,
-                         String selectionMode,
-                         String crossoverMethod,
-                         int crossoverNumPoints) {
+    private List<Chromosome> generatePopulation() {
         int[] binaryLengths = computeBinaryLengths(a, b, d);
         int[] numberOfValues = computeNumberOfValues(a, b, d);
+
         List<String> population = createPopulation(binaryLengths, numberOfValues);
-        List<Double> results = ratePopulation(a, b, population, binaryLengths);
-        List<Chromosome> chromosomes = generateChromosomes(population, results);
+        List<Double> ratedPopulation = ratePopulation(a, b, population, binaryLengths);
+
+        return generateChromosomes(population, ratedPopulation);
+    }
+
+    public void trivialSuccession(String selectionMethod,
+                                  String selectionMode,
+                                  String crossoverMethod) {
+
+        int[] binaryLengths = computeBinaryLengths(a, b, d);
+        List<Chromosome> population = generatePopulation();
 
         Selection selection = new Selection(selectionMethod);
-        List<Chromosome> resultsSelection = selection.performSelection(selectionMode, chromosomes);
+        Crossover crossover = new Crossover(crossoverMethod);
 
-        List<Chromosome> resultsMutation = mutate(resultsSelection);
-        List<Chromosome> resultsInversion = inverse(resultsMutation);
+        for (int i = 0; i < EPOCHS_NUMBER; i++) {
+            population = selection.performSelection(selectionMode, population);
+            population = mutate(population);
+            population = inverse(population);
+            population = crossover.performCrossover(population);
+            recalculateRastriginValue(a, b, population, binaryLengths);
+        }
 
-        Crossover crossover = new Crossover(crossoverMethod, crossoverNumPoints);
-        List<String> chromosomesStrings = resultsInversion.stream()
-                .map(Chromosome::getGenotype)
-                .collect(Collectors.toList());
-        List<String> resultsCrossover = crossover.performCrossover(chromosomesStrings);
+        System.out.println("Results for " + selectionMode + " optimization:");
+        for (Chromosome c : population) {
+            System.out.println(c);
+        }
+    }
 
-        System.out.println("Chromosomes and rastrigin function value:");
-        for (Chromosome c : chromosomes) {
+    public void partialSuccession(String selectionMethod,
+                                  String selectionMode,
+                                  String crossoverMethod,
+                                  String successionMode) {
+
+        int[] binaryLengths = computeBinaryLengths(a, b, d);
+        List<Chromosome> population = generatePopulation();
+
+        Random random = new Random();
+        Selection selection = new Selection(selectionMethod);
+        Crossover crossover = new Crossover(crossoverMethod);
+
+        for (int i = 0; i < EPOCHS_NUMBER; i++) {
+            List<Chromosome> resultsSelection = selection.performSelection(selectionMode, population);
+            List<Chromosome> resultsMutation = mutate(resultsSelection);
+            List<Chromosome> resultsInversion = inverse(resultsSelection);
+            List<Chromosome> resultsCrossover = crossover.performCrossover(resultsSelection);
+
+            recalculateRastriginValue(a, b, resultsMutation, binaryLengths);
+            recalculateRastriginValue(a, b, resultsInversion, binaryLengths);
+            recalculateRastriginValue(a, b, resultsCrossover, binaryLengths);
+
+            resultsMutation = getUniqueChromosomes(population, resultsMutation);
+            resultsInversion = getUniqueChromosomes(population, resultsInversion);
+            resultsCrossover = getUniqueChromosomes(population, resultsCrossover);
+
+
+            List<Chromosome> combinedResults = new ArrayList<>();
+            combinedResults.addAll(population);
+            combinedResults.addAll(resultsMutation);
+            combinedResults.addAll(resultsInversion);
+            combinedResults.addAll(resultsCrossover);
+
+
+            if (successionMode.equals("elite")) {
+                if (selectionMode.equals("max")) {
+                    combinedResults.sort(Comparator.comparing(Chromosome::getRastriginValue).reversed());
+                } else if (selectionMode.equals("min")) {
+                    combinedResults.sort(Comparator.comparing(Chromosome::getRastriginValue));
+                }
+                combinedResults = combinedResults.subList(0, POPULATION_SIZE);
+            } else if (successionMode.equals("random")) {
+                while (combinedResults.size() > POPULATION_SIZE) {
+                    int randomIndex = random.nextInt(combinedResults.size());
+                    combinedResults.remove(randomIndex);
+                }
+            }
+
+            population = combinedResults;
+        }
+
+        System.out.println("Results for " + selectionMode + " optimization:");
+        for (Chromosome c : population) {
             System.out.println(c);
         }
 
-        System.out.println("\n" + selectionMethod + " selection(" + selectionMode + "):");
-        for (Chromosome c : resultsSelection) {
-            System.out.println(c);
-        }
-
-        recalculateRastriginValue(a, b, resultsMutation, binaryLengths);
-        System.out.println("\nMutation results:");
-        for (Chromosome c : resultsMutation) {
-            System.out.println(c);
-        }
-
-        recalculateRastriginValue(a, b, resultsInversion, binaryLengths);
-        System.out.println("\nInversion results:");
-        for (Chromosome c : resultsInversion) {
-            System.out.println(c);
-        }
-
-        System.out.println("\nCrossover results:");
-        System.out.println(resultsCrossover);
-
-//        System.out.println("\nChromosomes before operations: " + chromosomesStrings +
-//                "\nChromosomes after mutation:    " + resultsMutation +
-//                "\nChromosomes after inversion:   " + resultsInversion);
-//        System.out.println("Crossover: " + crossoverResult);
     }
 }

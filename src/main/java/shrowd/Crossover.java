@@ -14,8 +14,8 @@ public class Crossover {
 
     private final CrossoverStrategy crossover;
 
-    public Crossover(String method, int numPoints) {
-        this.crossover = createCrossoverStrategy(method, numPoints);
+    public Crossover(String method) {
+        this.crossover = createCrossoverStrategy(method);
     }
 
     private List<String> crossbreedingChoosing(List<String> chromosomes) {
@@ -40,19 +40,23 @@ public class Crossover {
     }
 
 
-    private CrossoverStrategy createCrossoverStrategy(String method, int numPoints) {
+    private CrossoverStrategy createCrossoverStrategy(String method) {
         return switch (method) {
             case "single" -> new SinglePointCrossover();
             case "double" -> new TwoPointCrossover();
-            case "multi" -> new MultiPointCrossover(numPoints);
+            case "multi" -> new MultiPointCrossover();
             case "uniform" -> new UniformCrossover();
             default -> throw new IllegalArgumentException("Unknown crossover method: " + method);
         };
     }
 
-    public List<String> performCrossover(List<String> chromosomes) {
-        List<String> pairs = crossbreedingChoosing(chromosomes);
-        List<String> result = new ArrayList<>(chromosomes);
+    public List<Chromosome> performCrossover(List<Chromosome> chromosomes) {
+        List<String> chromosomesStrings = chromosomes.stream()
+                .map(Chromosome::getGenotype)
+                .collect(Collectors.toList());
+
+        List<String> pairs = crossbreedingChoosing(chromosomesStrings);
+        List<Chromosome> result = new ArrayList<>(chromosomes);
 
         if (pairs.size() < 2) {
             return result;
@@ -62,13 +66,13 @@ public class Crossover {
             String parent1 = pairs.get(i);
             String parent2 = pairs.get(i + 1);
 
-            int index1 = chromosomes.indexOf(parent1);
-            int index2 = chromosomes.indexOf(parent2);
+            int index1 = chromosomesStrings.indexOf(parent1);
+            int index2 = chromosomesStrings.indexOf(parent2);
 
             List<String> offspring = crossover.crossoverMethod(parent1, parent2);
 
-            String child1 = offspring.get(0);
-            String child2 = offspring.get(1);
+            Chromosome child1 = new Chromosome(offspring.get(0));
+            Chromosome child2 = new Chromosome(offspring.get(1));
 
             result.set(index1, child1);
             result.set(index2, child2);

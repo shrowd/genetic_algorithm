@@ -35,7 +35,7 @@ public class Inversion {
                     a++;
                     b--;
                 }
-                result.add(new Chromosome(new String(genes), chromosome.getRastriginValue()));
+                result.add(new Chromosome(new String(genes)));
             } else {
                 result.add(chromosome);
             }

@@ -1,20 +1,17 @@
 package shrowd.crossover;
 
-import lombok.AllArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@AllArgsConstructor
 public class MultiPointCrossover implements CrossoverStrategy {
-
-    private final int numPoints;
 
     @Override
     public List<String> crossoverMethod(String parent1, String parent2) {
         Random random = new Random();
         List<Integer> points = new ArrayList<>();
+
+        int numPoints = random.nextInt(parent1.length());
 
         while (points.size() < numPoints) {
             int point = random.nextInt(parent1.length());
