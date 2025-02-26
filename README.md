@@ -12,7 +12,6 @@ This repository contains an implementation of a genetic algorithm for optimizing
    * [Crossover Strategies](#crossover-strategies)
    * [Mutation and Inversion](#mutation-and-inversion)
 * [Configuration](#configuration)
-* [Project Structure](#project-structure)
 
 ## About
 This project implements a genetic algorithm for optimizing the Rastrigin function, commonly used in multi-dimensional optimization problems. The Rastrigin function is defined as:
@@ -131,36 +130,3 @@ Parameters include:
 - Selection mode (`min`, `max`)
 - Crossover method (`single`, `double`, `multi`, `uniform`)
 - Succession mode (`elite`, `random`) - only for `partialSuccession`
-
-## Project Structure
-
-```plaintext
-.
-├── src
-│   ├── main/java/shrowd
-│   │   ├── crossover
-│   │   │   ├── CrossoverStrategy.java
-│   │   │   ├── MultiPointCrossover.java
-│   │   │   ├── SinglePointCrossover.java
-│   │   │   ├── TwoPointCrossover.java
-│   │   │   └── UniformCrossover.java
-│   │   ├── selection
-│   │   │   ├── Ranking.java
-│   │   │   ├── Roulette.java
-│   │   │   ├── SelectionStrategy.java
-│   │   │   └── Tournament.java
-│   │   ├── Chromosome.java
-│   │   ├── Constants.java
-│   │   ├── Crossover.java
-│   │   ├── GeneticAlgorithm.java
-│   │   ├── Inversion.java
-│   │   ├── Main.java
-│   │   ├── Mutation.java
-│   │   ├── PopulationUtils.java
-│   │   ├── Selection.java
-│   │   └── Utils.java
-│   ├── test/java/shrowd
-├── .gitignore
-├── README.md
-└── pom.xml
-```
